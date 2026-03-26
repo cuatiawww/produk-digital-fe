@@ -1,0 +1,101 @@
+[
+  {
+    "id": 1,
+    "category": "Kesehatan",
+    "subcategory": "Ibu & Anak",
+    "title": "10T Ibu Hamil: Panduan Lengkap Sehat dan Aman hingga Persalinan",
+    "date": "2025-04-10",
+    "downloads": 4200,
+    "slug": "10t-ibu-hamil",
+    "cover": "/test1.jpg",
+    "orientation": "portrait"
+  },
+  {
+    "id": 2,
+    "category": "Kesehatan",
+    "subcategory": "Gizi",
+    "title": "Rahasia MP-ASI Kaya Protein Hewani untuk Tumbuh Kembang Optimal",
+    "date": "2025-03-22",
+    "downloads": 3100,
+    "slug": "mpasi-protein-hewani",
+    "cover": "/test2.jpg",
+    "orientation": "landscape"
+  },
+  {
+    "id": 3,
+    "category": "Kesehatan",
+    "subcategory": "Gizi",
+    "title": "Penuhi Gizi Seimbangmu: Panduan Gaya Hidup Sehat untuk Semua Usia",
+    "date": "2025-03-05",
+    "downloads": 2800,
+    "slug": "gizi-seimbang",
+    "cover": "/test3.jpg",
+    "orientation": "portrait"
+  },
+  {
+    "id": 4,
+    "category": "Kesehatan",
+    "subcategory": "Penyakit",
+    "title": "Kenali Gejala Diabetes Sejak Dini dan Cara Pencegahannya",
+    "date": "2025-02-18",
+    "downloads": 2500,
+    "slug": "kenali-diabetes",
+    "cover": "/test4.jpg",
+    "orientation": "landscape"
+  },
+  {
+    "id": 5,
+    "category": "Kesehatan",
+    "subcategory": "Ibu & Anak",
+    "title": "Panduan Imunisasi Lengkap Bayi 0–12 Bulan",
+    "date": "2025-02-10",
+    "downloads": 1900,
+    "slug": "imunisasi-bayi",
+    "cover": "/test5.jpg",
+    "orientation": "portrait"
+  },
+  {
+    "id": 6,
+    "category": "Teknologi",
+    "subcategory": "AI & Data",
+    "title": "Memahami Kecerdasan Buatan: Panduan Pemula Era Digital 2025",
+    "date": "2025-01-28",
+    "downloads": 1600,
+    "slug": "panduan-ai-pemula",
+    "cover": "/test2.jpg",
+    "orientation": "portrait"
+  },
+  {
+    "id": 7,
+    "category": "Bisnis",
+    "subcategory": "UMKM",
+    "title": "Template Rencana Bisnis Sederhana untuk UMKM yang Baru Mulai",
+    "date": "2025-01-20",
+    "downloads": 1450,
+    "slug": "template-rencana-bisnis-umkm",
+    "cover": "/test3.jpg",
+    "orientation": "portrait"
+  },
+  {
+    "id": 8,
+    "category": "Bisnis",
+    "subcategory": "Marketing",
+    "title": "Panduan Konten Promosi Digital agar Produk Lebih Mudah Dilirik",
+    "date": "2025-01-14",
+    "downloads": 1320,
+    "slug": "panduan-konten-promosi-digital",
+    "cover": "/test4.jpg",
+    "orientation": "landscape"
+  },
+  {
+    "id": 9,
+    "category": "Bisnis",
+    "subcategory": "Administrasi",
+    "title": "Worksheet Pencatatan Penjualan Harian untuk Bisnis Kecil dan Menengah",
+    "date": "2025-01-08",
+    "downloads": 1180,
+    "slug": "worksheet-penjualan-harian",
+    "cover": "/test5.jpg",
+    "orientation": "portrait"
+  }
+]

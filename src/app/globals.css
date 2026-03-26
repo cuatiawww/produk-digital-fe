@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F4F9FF;
+  --foreground: #0F2E52;
+  --brand: #2D85E3;
+  --brand-dark: #2D85E3;
+  --brand-soft: #EAF3FF;
+  --ink: #0D2A47;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-roboto), sans-serif;
+}
+
+@layer utilities {
+  .bg-site-surface {
+    background-image:
+      linear-gradient(rgba(244, 249, 255, 0.88), rgba(244, 249, 255, 0.88)),
+      url("/background.webp");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .bg-site-surface-soft {
+    background-image:
+      linear-gradient(rgba(244, 249, 255, 0.94), rgba(244, 249, 255, 0.94)),
+      url("/background.webp");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .container-custom {
+    @apply mx-auto w-full max-w-[1400px] px-3 sm:px-4 lg:px-6;
+  }
+  .section-padding-lg {
+    @apply py-10 md:py-14;
+  }
+}
