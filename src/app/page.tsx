@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import HeroSection from "@/components/sections/HeroSection";
 import ProductsSection from "@/components/sections/ProductsSection";
 import { products } from "@/data/products";
+import type { Product } from "@/data/products";
 
 export const metadata: Metadata = {
   title: "Produk Digital Media Cipta",
@@ -14,25 +15,44 @@ export const metadata: Metadata = {
 
 const popularTopics = ["Ibu Hamil", "MP-ASI", "Diabetes", "Template Kerja", "UMKM"];
 
-export default function Home() {
-  const stats = [
-    { label: "Produk", value: `${products.length}+` },
-    {
-      label: "Kategori",
-      value: `${new Set(products.map((product) => product.category)).size}`,
-    },
-    {
-      label: "Unduhan",
-      value: `${Math.round(
-        products.reduce((total, product) => total + product.downloads, 0) / 1000
-      )}K+`,
-    },
-    { label: "Update", value: "Mingguan" },
-  ];
+async function fetchProductsFromApi(): Promise<Product[]> {
+  const envBase = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+  const apiRoot = envBase !== "" ? envBase : "http://localhost/produk-digital";
+  const endpoint = `${apiRoot}/api-katalog-download?per_page=1000&page=1`;
+
+  try {
+    const res = await fetch(endpoint, { cache: "no-store" });
+    if (!res.ok) return [];
+    const json = await res.json();
+    const data = Array.isArray(json?.data) ? json.data : [];
+    return data.map((item: any) => ({
+      id: Number(item.id),
+      title: String(item.judul ?? ""),
+      category: String(item.kategori ?? ""),
+      subcategory: String(item.jenis ?? ""),
+      date: String(item.created_at ?? ""),
+      downloads: Number(item.total_download ?? 0),
+      slug: String(item.id ?? ""),
+      cover: String(item.cover_url ?? ""),
+      orientation: "portrait",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
+  const fetchedProducts = await fetchProductsFromApi();
+  const productSource = fetchedProducts.length > 0 ? fetchedProducts : products;
+  const initialTotals = {
+    totalProduk: productSource.length,
+    totalKategori: new Set(productSource.map((product) => product.category)).size,
+    totalUnduhan: productSource.reduce((total, product) => total + product.downloads, 0),
+  };
 
   return (
     <>
-      <HeroSection popularTopics={popularTopics} stats={stats} />
+      <HeroSection popularTopics={popularTopics} initialTotals={initialTotals} />
 
       <section className="border-b border-[#D4E5F8] bg-white">
         <div className="container-custom py-6 lg:py-7">
@@ -65,11 +85,12 @@ export default function Home() {
 
                 <div className="relative min-h-[210px]">
                   <Image
-                    src={products[1]?.cover ?? products[0].cover}
+                    src={productSource[1]?.cover ?? productSource[0]?.cover}
                     alt="Koleksi pilihan Media Cipta"
                     fill
-                    className="object-contain p-4"
+                    className="object-cover"
                     sizes="(max-width: 768px) 100vw, 40vw"
+                    unoptimized
                   />
                 </div>
               </div>
@@ -77,11 +98,12 @@ export default function Home() {
 
             <article className="relative overflow-hidden rounded-[28px] border border-[#D4E5F8] bg-[#0B2A49]">
               <Image
-                src={products[3]?.cover ?? products[0].cover}
+                src={productSource[3]?.cover ?? productSource[0]?.cover}
                 alt="Produk unggulan lainnya"
                 fill
                 className="object-cover opacity-55"
                 sizes="(max-width: 1280px) 100vw, 24vw"
+                unoptimized
               />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,46,82,0.1)_0%,rgba(15,46,82,0.82)_100%)]" />
               <div className="relative flex min-h-[210px] flex-col justify-end p-5">
@@ -103,7 +125,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <ProductsSection products={products} />
+      <ProductsSection products={productSource} />
     </>
   );
 }

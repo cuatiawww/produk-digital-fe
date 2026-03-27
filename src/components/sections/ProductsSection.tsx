@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Cpu,
   Download,
-  Eye,
   ImageIcon,
   LayoutGrid,
   Users,
@@ -21,53 +20,7 @@ type ProductsSectionProps = {
   products: Product[];
 };
 
-function LoginModal({
-  product,
-  onClose,
-  onLogin,
-}: {
-  product: Product | null;
-  onClose: () => void;
-  onLogin: () => void;
-}) {
-  if (!product) return null;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="mx-4 w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-2xl">
-        <div className="mb-4 text-4xl">Login</div>
-        <h2 className="mb-2 text-lg font-bold text-[#173A60]">Login untuk Mengunduh</h2>
-        <p className="mb-5 text-sm leading-relaxed text-[#5F7FA4]">
-          Masuk ke akun kamu untuk mengakses dan mengunduh produk digital ini.
-        </p>
-        <div className="mb-5 rounded-xl bg-[#EAF3FF] px-4 py-3 text-left">
-          <p className="line-clamp-2 text-sm font-semibold text-[#173A60]">{product.title}</p>
-          <p className="mt-1 text-xs text-[#2D85E3]">
-            {product.category} - {product.subcategory}
-          </p>
-        </div>
-        <button
-          onClick={onLogin}
-          className="mb-3 w-full rounded-xl bg-[#2D85E3] py-3 text-sm font-semibold text-white transition hover:bg-[#2D85E3]"
-        >
-          Masuk ke Akun
-        </button>
-        <button
-          onClick={onLogin}
-          className="mb-4 w-full rounded-xl border-2 border-[#2D85E3] py-3 text-sm font-semibold text-[#2D85E3] transition hover:bg-[#EAF3FF]"
-        >
-          Daftar Gratis
-        </button>
-        <button onClick={onClose} className="text-xs text-[#7D9FC3] hover:text-[#5F7FA4]">
-          Tutup
-        </button>
-      </div>
-    </div>
-  );
-}
+type CategoryItem = { name: string; count: number; icon?: ReactNode };
 
 function Sidebar({
   selected,
@@ -156,11 +109,9 @@ function Sidebar({
 function ProductCard({
   product,
   onDownload,
-  isLoggedIn,
 }: {
   product: Product;
   onDownload: (p: Product) => void;
-  isLoggedIn: boolean;
 }) {
   const [imgError, setImgError] = useState(false);
   const cardTone = {
@@ -170,58 +121,56 @@ function ProductCard({
   };
 
   return (
-    <article className="group flex w-full max-w-[280px] flex-col overflow-hidden rounded-[26px] border border-[#D4E5F8] bg-white transition-all duration-300 hover:-translate-y-1">
-      <Link href="/detail" className="relative block aspect-square w-full overflow-hidden bg-[#EEF3FB]">
+    <article className="group flex h-[360px] w-full max-w-[280px] flex-col overflow-hidden rounded-[26px] border border-[#D4E5F8] bg-white transition-all duration-300 hover:-translate-y-1">
+      <Link
+        href={`/detail/${product.id}`}
+        className="relative block flex-[7] w-full overflow-hidden bg-[#EEF3FB]"
+      >
         {imgError ? (
           <div className="flex h-full w-full items-center justify-center bg-[#F3F6FC]">
             <ImageIcon className="h-12 w-12 text-[#B2C5DE]" />
           </div>
         ) : (
-          <Image
-            src={product.cover}
-            alt={product.title}
-            fill
-            className="object-contain p-3 transition-transform duration-700 group-hover:scale-[1.03]"
-            sizes="(max-width: 640px) 100vw, 280px"
-            onError={() => setImgError(true)}
-          />
+            <Image
+              src={product.cover}
+              alt={product.title}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              sizes="(max-width: 640px) 100vw, 280px"
+              unoptimized
+              onError={() => setImgError(true)}
+            />
         )}
       </Link>
 
-      <div className="flex flex-col gap-2 p-4">
+      <div className="flex flex-[3] flex-col gap-2 p-4">
         <div className="flex items-center justify-between gap-3">
           <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${cardTone.text}`}>
             {product.category}
           </p>
-          <span className="flex items-center gap-1 text-[10px] text-[#7D9FC3]">
-            <Download className="h-3 w-3" />
-            {product.downloads.toLocaleString("id-ID")}
-          </span>
+          <span className="text-[9px] font-medium text-[#7D9FC3]">{product.subcategory}</span>
         </div>
 
         <Link
-          href="/detail"
-          className="line-clamp-2 text-sm font-semibold leading-snug text-[#1A365A] transition-colors hover:text-[#2D85E3]"
+          href={`/detail/${product.id}`}
+          className="line-clamp-2 min-h-[40px] text-sm font-semibold leading-snug text-[#1A365A] transition-colors hover:text-[#2D85E3]"
         >
           {product.title}
         </Link>
 
-        <button
-          onClick={() => onDownload(product)}
-          className={`mt-1 flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-semibold transition-all duration-200 ${cardTone.border} ${cardTone.text} ${cardTone.button} hover:border-transparent hover:text-white`}
-        >
-          {isLoggedIn ? (
-            <>
-              <Download className="h-3.5 w-3.5" />
-              Unduh Sekarang
-            </>
-          ) : (
-            <>
-              <Eye className="h-3.5 w-3.5" />
-              Login untuk Unduh
-            </>
-          )}
-        </button>
+        <div className="mt-auto flex items-center gap-3 pt-1">
+          <button
+            onClick={() => onDownload(product)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#2D85E3] px-3 py-2.5 text-xs font-semibold text-white transition-all duration-200 hover:bg-[#1F6FCC]"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Download
+          </button>
+          <span className="flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#7D9FC3]">
+            <Download className="h-3 w-3" />
+            {product.downloads.toLocaleString("id-ID")}
+          </span>
+        </div>
       </div>
     </article>
   );
@@ -232,7 +181,7 @@ function GalleryCard({ product }: { product: Product }) {
 
   return (
     <Link
-      href="/detail"
+      href={`/detail/${product.id}`}
       className="group block overflow-hidden rounded-[24px] border border-[#D4E5F8] bg-white transition-all duration-300 hover:-translate-y-1"
     >
       <div className="relative aspect-square w-full overflow-hidden bg-[#EEF3FB]">
@@ -247,15 +196,19 @@ function GalleryCard({ product }: { product: Product }) {
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            unoptimized
             onError={() => setImgError(true)}
           />
         )}
       </div>
 
       <div className="p-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2D85E3]">
-          {product.category}
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2D85E3]">
+            {product.category}
+          </p>
+          <span className="text-[9px] font-medium text-[#7D9FC3]">{product.subcategory}</span>
+        </div>
         <p className="mt-1 line-clamp-2 text-xs font-semibold leading-5 text-[#1A365A]">
           {product.title}
         </p>
@@ -265,34 +218,89 @@ function GalleryCard({ product }: { product: Product }) {
 }
 
 export default function ProductsSection({ products }: ProductsSectionProps) {
+  const [itemsAll, setItemsAll] = useState<Product[]>(products);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sort, setSort] = useState("terbaru");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [modalProduct, setModalProduct] = useState<Product | null>(null);
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const galleryRef = useRef<HTMLDivElement | null>(null);
   const categoryRowRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const categoryList = useMemo(
-    () => [
-      {
-        name: "Kesehatan",
-        icon: <Users size={16} />,
-        count: products.filter((p) => p.category === "Kesehatan").length,
-      },
-      {
-        name: "Teknologi",
-        icon: <Cpu size={16} />,
-        count: products.filter((p) => p.category === "Teknologi").length,
-      },
-      {
-        name: "Bisnis",
-        icon: <Briefcase size={16} />,
-        count: products.filter((p) => p.category === "Bisnis").length,
-      },
-    ],
-    [products]
-  );
+  useEffect(() => {
+    const envBase = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+    const apiRoot = envBase !== "" ? envBase : "http://localhost/produk-digital";
+    const endpoint = `${apiRoot}/api-katalog-download?per_page=1000&page=1`;
+
+    const controller = new AbortController();
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(endpoint, { signal: controller.signal });
+        if (!res.ok) return;
+        const json = await res.json();
+        const data = Array.isArray(json?.data) ? json.data : [];
+        const mapped: Product[] = data.map((item: any) => ({
+          id: Number(item.id),
+          title: String(item.judul ?? ""),
+          category: String(item.kategori ?? ""),
+          subcategory: String(item.jenis ?? ""),
+          date: String(item.created_at ?? ""),
+          downloads: Number(item.total_download ?? 0),
+          slug: String(item.id ?? ""),
+          cover: String(item.cover_url ?? ""),
+          orientation: "portrait",
+        }));
+        if (mapped.length > 0) setItemsAll(mapped);
+      } catch (_) {
+        // ignore fetch errors, fallback to initial products
+      }
+    };
+
+    fetchProducts();
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const envBase = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+    const apiRoot = envBase !== "" ? envBase : "http://localhost/produk-digital";
+    const endpoint = `${apiRoot}/api-kategori-produk`;
+
+    const controller = new AbortController();
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(endpoint, { signal: controller.signal });
+        if (!res.ok) return;
+        const json = await res.json();
+        const data = Array.isArray(json?.data) ? json.data : [];
+        const mapped: CategoryItem[] = data.map((item: any) => ({
+          name: String(item.name ?? ""),
+          count: Number(item.count ?? 0),
+        }));
+        setCategories(mapped);
+      } catch (_) {
+        // ignore
+      }
+    };
+
+    fetchCategories();
+    return () => controller.abort();
+  }, []);
+
+  const fallbackCategoryList = useMemo(() => {
+    const map = new Map<string, number>();
+    itemsAll.forEach((p) => {
+      map.set(p.category, (map.get(p.category) ?? 0) + 1);
+    });
+    return Array.from(map.entries()).map(([name, count]) => ({ name, count }));
+  }, [itemsAll]);
+
+  const categoryList = (categories.length > 0 ? categories : fallbackCategoryList).map((cat, idx) => ({
+    ...cat,
+    icon:
+      cat.name === "Kesehatan" ? <Users size={16} /> :
+      cat.name === "Teknologi" ? <Cpu size={16} /> :
+      cat.name === "Bisnis" ? <Briefcase size={16} /> :
+      <LayoutGrid size={16} />,
+  }));
 
   const toggleCategory = (name: string) =>
     setSelectedCategories((prev) =>
@@ -302,19 +310,11 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
   const clearCategories = () => setSelectedCategories([]);
 
   const handleDownload = (product: Product) => {
-    if (!isLoggedIn) setModalProduct(product);
-    else alert(`Mengunduh: ${product.title}`);
-  };
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    const pending = modalProduct;
-    setModalProduct(null);
-    if (pending) setTimeout(() => alert(`Mengunduh: ${pending.title}`), 150);
+    alert(`Mengunduh: ${product.title}`);
   };
 
   const filtered = useMemo(() => {
-    let result = [...products];
+    let result = [...itemsAll];
     if (selectedCategories.length > 0) {
       result = result.filter((p) => selectedCategories.includes(p.category));
     }
@@ -322,7 +322,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
     if (sort === "terlama") result.sort((a, b) => a.date.localeCompare(b.date));
     if (sort === "unduhan") result.sort((a, b) => b.downloads - a.downloads);
     return result;
-  }, [products, selectedCategories, sort]);
+  }, [itemsAll, selectedCategories, sort]);
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -377,7 +377,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
   const categoryShowcase = useMemo(
     () =>
       categoryList.map((category) => {
-        const items = products.filter((product) => product.category === category.name);
+        const items = itemsAll.filter((product) => product.category === category.name);
 
         if (items.length === 0) {
           return { ...category, items: [] };
@@ -391,27 +391,11 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
           items: filledItems,
         };
       }),
-    [categoryList, products]
+    [categoryList, itemsAll]
   );
 
   return (
     <section className="bg-site-surface-soft min-h-screen">
-      <LoginModal product={modalProduct} onClose={() => setModalProduct(null)} onLogin={handleLogin} />
-
-      {isLoggedIn && (
-        <div className="bg-site-surface-soft border-b border-[#C5DCF6] py-2">
-          <div className="container-custom flex items-center justify-between">
-            <span className="text-sm font-medium text-[#2D85E3]">Halo, Pengguna!</span>
-            <button
-              onClick={() => setIsLoggedIn(false)}
-              className="text-xs font-medium text-red-500 hover:text-red-600"
-            >
-              Keluar
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="container-custom py-7">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)]">
           <Sidebar
@@ -419,7 +403,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
             onToggle={toggleCategory}
             onClear={clearCategories}
             categoryList={categoryList}
-            totalCount={products.length}
+            totalCount={itemsAll.length}
           />
 
           <div className="min-w-0">
@@ -463,13 +447,12 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
                   ref={carouselRef}
                   className="overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
-                  <div className="grid grid-flow-col auto-cols-[minmax(220px,260px)] gap-4 md:auto-cols-[minmax(240px,280px)]">
+                  <div className="grid grid-flow-col auto-cols-[minmax(240px,260px)] gap-4">
                     {filtered.map((product) => (
                       <ProductCard
                         key={product.id}
                         product={product}
                         onDownload={handleDownload}
-                        isLoggedIn={isLoggedIn}
                       />
                     ))}
                   </div>
@@ -489,27 +472,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
                 Section terpisah untuk lihat-lihat cover tanpa ikut filter kategori di atas
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <p className="text-sm text-[#7893B6]">{products.length} item</p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => scrollGallery("left")}
-                  aria-label="Geser galeri ke kiri"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[#CFE1F6] bg-white text-[#355F90] transition hover:border-[#2D85E3] hover:text-[#2D85E3]"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollGallery("right")}
-                  aria-label="Geser galeri ke kanan"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[#CFE1F6] bg-white text-[#355F90] transition hover:border-[#2D85E3] hover:text-[#2D85E3]"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <p className="text-sm text-[#7893B6]">{itemsAll.length} item</p>
           </div>
 
           <div
@@ -517,7 +480,7 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
             className="overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <div className="grid grid-flow-col auto-cols-[minmax(170px,220px)] gap-4 md:auto-cols-[minmax(200px,240px)]">
-              {products.map((product) => (
+              {itemsAll.map((product) => (
                 <GalleryCard key={`gallery-${product.id}`} product={product} />
               ))}
             </div>
@@ -574,7 +537,6 @@ export default function ProductsSection({ products }: ProductsSectionProps) {
                         key={`${category.name}-${product.id}-${index}`}
                         product={product}
                         onDownload={handleDownload}
-                        isLoggedIn={isLoggedIn}
                       />
                     ))}
                   </div>

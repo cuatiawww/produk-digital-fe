@@ -1,14 +1,71 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight, BadgeCheck, Download, Search } from "lucide-react";
 
 type HeroSectionProps = {
   popularTopics: string[];
-  stats: {
-    label: string;
-    value: string;
-  }[];
+  initialTotals: {
+    totalProduk: number;
+    totalKategori: number;
+    totalUnduhan: number;
+  };
 };
 
-export default function HeroSection({ popularTopics, stats }: HeroSectionProps) {
+export default function HeroSection({ popularTopics, initialTotals }: HeroSectionProps) {
+  const router = useRouter();
+  const [totals, setTotals] = useState(initialTotals);
+  const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    const envBase = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+    const apiRoot = envBase !== "" ? envBase : "http://localhost/produk-digital";
+    const endpoint = `${apiRoot}/api-katalog-download`;
+    const catEndpoint = `${apiRoot}/api-kategori-produk`;
+
+    const controller = new AbortController();
+    const fetchStats = async () => {
+      try {
+        const [resProducts, resCats] = await Promise.all([
+          fetch(endpoint, { signal: controller.signal }),
+          fetch(catEndpoint, { signal: controller.signal }),
+        ]);
+        if (!resProducts.ok || !resCats.ok) return;
+
+        const jsonProducts = await resProducts.json();
+        const jsonCats = await resCats.json();
+
+        const data = Array.isArray(jsonProducts?.data) ? jsonProducts.data : [];
+        const cats = Array.isArray(jsonCats?.data) ? jsonCats.data : [];
+
+        const totalProduk = Number(jsonProducts?.meta?.total ?? data.length ?? 0);
+        const totalKategori = cats.length;
+        const totalUnduhan = data.reduce(
+          (sum: number, item: any) => sum + Number(item.total_download ?? 0),
+          0
+        );
+
+        setTotals({ totalProduk, totalKategori, totalUnduhan });
+      } catch (_) {
+        // ignore fetch errors, fallback to initialTotals
+      }
+    };
+
+    fetchStats();
+    return () => controller.abort();
+  }, []);
+
+  const stats = [
+    { label: "Produk", value: `${totals.totalProduk}+` },
+    { label: "Kategori", value: `${totals.totalKategori}` },
+    {
+      label: "Unduhan",
+      value: `${Math.round(totals.totalUnduhan / 1000)}K+`,
+    },
+    { label: "Update", value: "Mingguan" },
+  ];
+
   return (
     <section className="bg-site-surface relative overflow-hidden border-b border-[#D1E4F8]">
       <div className="absolute inset-0">
@@ -32,19 +89,31 @@ export default function HeroSection({ popularTopics, stats }: HeroSectionProps) 
             </div>
 
             <div className="relative mt-8 max-w-2xl rounded-[28px] border border-white/80 bg-white/85 p-3">
-              <div className="flex flex-col gap-3 md:flex-row">
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  const trimmed = searchText.trim();
+                  router.push(trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : "/search");
+                }}
+                className="flex flex-col gap-3 md:flex-row"
+              >
                 <div className="relative flex-1">
                   <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7391B5]" />
                   <input
+                    value={searchText}
+                    onChange={(event) => setSearchText(event.target.value)}
                     className="w-full rounded-2xl border border-[#CFE1F6] bg-[#F5F9FF] py-4 pl-11 pr-4 text-sm text-[#0F2E52] placeholder:text-[#7391B5] focus:border-[#2D85E3] focus:outline-none focus:ring-4 focus:ring-[#2D85E3]/10"
                     placeholder="Cari e-book, template, worksheet, atau panduan..."
                   />
                 </div>
-                <button className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#2D85E3] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#2D85E3]">
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#2D85E3] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#2D85E3]"
+                >
                   Eksplor Produk
                   <ArrowRight className="h-4 w-4" />
                 </button>
-              </div>
+              </form>
             </div>
 
             <div className="mt-5 flex flex-wrap items-center gap-2 text-xs">
@@ -52,6 +121,8 @@ export default function HeroSection({ popularTopics, stats }: HeroSectionProps) 
               {popularTopics.map((tag) => (
                 <button
                   key={tag}
+                  type="button"
+                  onClick={() => router.push(`/search?q=${encodeURIComponent(tag)}`)}
                   className="rounded-full border border-[#C8DCF4] bg-white/80 px-4 py-2 text-[#355F90] transition hover:border-[#2D85E3] hover:text-[#2D85E3]"
                 >
                   {tag}
@@ -157,3 +228,6 @@ export default function HeroSection({ popularTopics, stats }: HeroSectionProps) 
     </section>
   );
 }
+
+
+
